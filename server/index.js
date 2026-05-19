@@ -14,6 +14,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:4173',
+  'https://dhruvix.onrender.com',   // Render backend (for health checks)
   /\.vercel\.app$/,                 // all *.vercel.app preview + production URLs
   process.env.FRONTEND_URL,         // set this to your custom domain e.g. https://dhruvix.tech
 ].filter(Boolean);
