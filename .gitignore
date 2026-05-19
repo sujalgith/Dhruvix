@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Build output
+client/dist/
+client/.vite/
+
+# Environment variables (NEVER commit these)
+.env
+.env.local
+.env.production
+client/.env
+client/.env.local
+client/.env.production
+server/.env
+
+# Logs & data
+*.log
+server/leads.json
+server/users.json
+
+# OS
+.DS_Store
+Thumbs.db

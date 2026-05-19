@@ -1,0 +1,661 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --p:#7c3aed;--p2:#a855f7;--b:#2563eb;--g:#10b981;
+  --bg:#05030f;--bg2:#090618;--bg3:#0d0824;
+  --t:#f0ebff;--tm:rgba(240,235,255,0.6);--td:rgba(240,235,255,0.2);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--t);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
+
+/* CANVAS */
+#cvs{position:fixed;inset:0;z-index:0;pointer-events:none;}
+
+/* CURSOR */
+.cursor{
+  position:fixed;width:12px;height:12px;border-radius:50%;
+  background:var(--p2);pointer-events:none;z-index:9999;
+  mix-blend-mode:screen;transition:transform 0.1s;
+  transform:translate(-50%,-50%);
+}
+.cursor-ring{
+  position:fixed;width:40px;height:40px;border-radius:50%;
+  border:1px solid rgba(168,85,247,0.4);pointer-events:none;z-index:9998;
+  transform:translate(-50%,-50%);transition:all 0.15s ease;
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  padding:0 40px;height:64px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(5,3,15,0.5);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.nav-logo{
+  font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:4px;
+  background:linear-gradient(90deg,#a855f7,#60a5fa,#34d399);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  cursor:pointer;
+}
+.nav-links{display:flex;gap:28px;list-style:none;}
+.nav-links a{font-size:12px;color:var(--td);text-decoration:none;letter-spacing:2px;text-transform:uppercase;transition:color 0.3s;}
+.nav-links a:hover{color:var(--t);}
+.nav-btn{
+  background:linear-gradient(135deg,var(--p),var(--b));
+  border:none;color:#fff;padding:8px 20px;border-radius:6px;
+  font-size:12px;font-family:'DM Sans',sans-serif;letter-spacing:1px;
+  cursor:pointer;position:relative;overflow:hidden;
+}
+.nav-btn::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,#a855f7,#3b82f6);
+  opacity:0;transition:opacity 0.3s;
+}
+.nav-btn:hover::after{opacity:1;}
+
+/* SECTIONS */
+section{position:relative;z-index:1;}
+
+/* HERO */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:80px 24px 60px;
+  overflow:hidden;
+}
+
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid rgba(168,85,247,0.3);
+  background:rgba(124,58,237,0.08);
+  color:#a855f7;padding:6px 18px;border-radius:100px;
+  font-size:11px;letter-spacing:3px;text-transform:uppercase;
+  margin-bottom:40px;
+  opacity:0;animation:slideDown 0.8s 0.3s ease forwards;
+}
+.live-dot{
+  width:7px;height:7px;border-radius:50%;background:#10b981;
+  box-shadow:0 0 8px #10b981;animation:livepulse 1.5s infinite;
+}
+@keyframes livepulse{0%,100%{box-shadow:0 0 4px #10b981;}50%{box-shadow:0 0 16px #10b981,0 0 30px rgba(16,185,129,0.3);}}
+
+.hero-h{
+  font-family:'Bebas Neue',cursive;
+  font-size:clamp(64px,12vw,140px);
+  line-height:0.88;letter-spacing:3px;
+  margin-bottom:24px;
+  opacity:0;animation:slideUp 1s 0.5s ease forwards;
+}
+.hero-h .l1{
+  display:block;
+  background:linear-gradient(135deg,#fff 0%,#e9d5ff 40%,#bfdbfe 100%);
+  background-size:200%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:gradShift 4s ease infinite;
+}
+.hero-h .l2{
+  display:block;color:transparent;
+  -webkit-text-stroke:1.5px rgba(168,85,247,0.25);
+}
+.hero-h .l3{
+  display:block;
+  background:linear-gradient(90deg,#a855f7,#60a5fa,#34d399,#a855f7);
+  background-size:300%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:gradShift 3s ease infinite;
+}
+@keyframes gradShift{0%{background-position:0%;}50%{background-position:100%;}100%{background-position:0%;}}
+
+.typed-wrap{
+  font-size:18px;font-weight:300;color:var(--tm);margin-bottom:12px;
+  min-height:28px;
+  opacity:0;animation:slideUp 1s 0.8s ease forwards;
+}
+#typed{color:#a855f7;}
+.cursor-blink{animation:blink 0.8s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+.hero-sub{
+  font-size:15px;font-weight:300;color:var(--td);
+  max-width:460px;line-height:1.8;margin:16px auto 44px;
+  opacity:0;animation:slideUp 1s 1s ease forwards;
+}
+
+.hero-btns{
+  display:flex;gap:14px;justify-content:center;flex-wrap:wrap;
+  opacity:0;animation:slideUp 1s 1.2s ease forwards;
+}
+.btn-main{
+  background:linear-gradient(135deg,#7c3aed,#2563eb);
+  border:none;color:#fff;padding:15px 36px;border-radius:10px;
+  font-size:14px;font-family:'DM Sans',sans-serif;font-weight:500;
+  cursor:pointer;letter-spacing:0.5px;
+  box-shadow:0 0 40px rgba(124,58,237,0.35);
+  transition:box-shadow 0.3s,transform 0.2s;
+  position:relative;overflow:hidden;
+}
+.btn-main::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);
+  transform:translateX(-100%);transition:transform 0.4s;
+}
+.btn-main:hover::before{transform:translateX(100%);}
+.btn-main:hover{box-shadow:0 0 60px rgba(124,58,237,0.6);transform:translateY(-2px);}
+
+.btn-ghost2{
+  background:transparent;border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.5);padding:15px 36px;border-radius:10px;
+  font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;
+  transition:all 0.3s;letter-spacing:0.5px;
+}
+.btn-ghost2:hover{border-color:rgba(168,85,247,0.5);color:#fff;transform:translateY(-2px);}
+
+/* SCROLL INDICATOR */
+.scroll-ind{
+  position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  opacity:0;animation:fadeIn 1s 2s ease forwards;
+}
+.scroll-line{
+  width:1px;height:48px;background:linear-gradient(to bottom,transparent,rgba(168,85,247,0.6));
+  animation:scrollLine 2s ease infinite;
+}
+@keyframes scrollLine{0%{transform:scaleY(0);transform-origin:top;}50%{transform:scaleY(1);transform-origin:top;}51%{transform-origin:bottom;}100%{transform:scaleY(0);transform-origin:bottom;}}
+.scroll-txt{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--td);}
+
+/* MARQUEE */
+.marquee-section{
+  padding:20px 0;
+  border-top:1px solid rgba(255,255,255,0.04);
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  background:rgba(255,255,255,0.01);overflow:hidden;
+}
+.mq-track{display:flex;width:max-content;animation:mq 25s linear infinite;}
+.mq-item{
+  display:flex;align-items:center;gap:40px;padding:0 20px;
+  font-family:'Bebas Neue',cursive;font-size:13px;letter-spacing:5px;
+  color:rgba(255,255,255,0.1);white-space:nowrap;
+}
+.mq-star{color:rgba(168,85,247,0.4);font-size:10px;}
+@keyframes mq{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* SERVICES */
+.services{padding:100px 40px;}
+.sec-label{
+  font-size:11px;letter-spacing:4px;text-transform:uppercase;
+  color:rgba(168,85,247,0.5);margin-bottom:12px;
+  display:flex;align-items:center;gap:10px;
+}
+.sec-label::before{content:'';width:24px;height:1px;background:rgba(168,85,247,0.4);}
+.sec-title{
+  font-family:'Bebas Neue',cursive;
+  font-size:clamp(40px,6vw,72px);letter-spacing:2px;
+  margin-bottom:60px;line-height:1;
+}
+.sec-title span{
+  background:linear-gradient(90deg,#a855f7,#60a5fa);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+.svc-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+.svc{
+  background:#09071e;border:1px solid rgba(255,255,255,0.05);
+  border-radius:16px;padding:36px 28px;
+  position:relative;overflow:hidden;cursor:default;
+  transition:border-color 0.4s,transform 0.4s;
+}
+.svc:hover{border-color:var(--hc);transform:translateY(-6px);}
+.svc::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0%,var(--hc-glow) 0%,transparent 70%);
+  opacity:0;transition:opacity 0.4s;
+}
+.svc:hover::before{opacity:1;}
+.svc:nth-child(1){--hc:rgba(168,85,247,0.4);--hc-glow:rgba(168,85,247,0.06);}
+.svc:nth-child(2){--hc:rgba(96,165,250,0.4);--hc-glow:rgba(96,165,250,0.06);}
+.svc:nth-child(3){--hc:rgba(52,211,153,0.4);--hc-glow:rgba(52,211,153,0.06);}
+
+.svc-no{
+  font-family:'Bebas Neue',cursive;font-size:60px;letter-spacing:2px;
+  color:rgba(255,255,255,0.03);line-height:1;margin-bottom:20px;
+  position:relative;z-index:1;
+}
+.svc-ico{
+  width:48px;height:48px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:20px;font-size:22px;
+  position:relative;z-index:1;
+}
+.ico1{background:rgba(124,58,237,0.12);color:#a855f7;}
+.ico2{background:rgba(37,99,235,0.12);color:#60a5fa;}
+.ico3{background:rgba(16,185,129,0.12);color:#34d399;}
+
+.svc-t{font-size:18px;font-weight:600;color:#e9d5ff;margin-bottom:10px;position:relative;z-index:1;}
+.svc-d{font-size:13px;font-weight:300;color:var(--td);line-height:1.7;position:relative;z-index:1;}
+.svc-price{
+  margin-top:20px;display:inline-block;
+  font-size:12px;letter-spacing:1px;
+  color:rgba(168,85,247,0.7);
+  border:1px solid rgba(168,85,247,0.2);
+  padding:4px 12px;border-radius:100px;
+  position:relative;z-index:1;
+}
+
+/* STATS */
+.stats-sec{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-top:1px solid rgba(255,255,255,0.04);
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.stat{
+  padding:40px 24px;text-align:center;
+  border-right:1px solid rgba(255,255,255,0.04);
+  position:relative;overflow:hidden;
+}
+.stat:last-child{border-right:none;}
+.stat::before{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:2px;
+  background:var(--sc);transform:scaleX(0);
+  transition:transform 0.6s ease;transform-origin:left;
+}
+.stat:hover::before{transform:scaleX(1);}
+.stat:nth-child(1){--sc:linear-gradient(90deg,#a855f7,#7c3aed);}
+.stat:nth-child(2){--sc:linear-gradient(90deg,#60a5fa,#2563eb);}
+.stat:nth-child(3){--sc:linear-gradient(90deg,#34d399,#10b981);}
+.stat:nth-child(4){--sc:linear-gradient(90deg,#fb923c,#f59e0b);}
+.stat-n{
+  font-family:'Bebas Neue',cursive;font-size:56px;letter-spacing:3px;
+  background:linear-gradient(135deg,#a855f7,#60a5fa);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1;margin-bottom:8px;
+}
+.stat-l{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--td);}
+
+/* WHY */
+.why-sec{padding:100px 40px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.why-left .sec-title{margin-bottom:20px;}
+.why-left p{font-size:14px;font-weight:300;color:var(--td);line-height:1.9;max-width:380px;margin-bottom:36px;}
+.why-right{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.pill{
+  background:#09071e;border:1px solid rgba(255,255,255,0.05);
+  border-radius:14px;padding:22px 18px;
+  transition:border-color 0.3s,transform 0.3s;
+}
+.pill:hover{border-color:rgba(168,85,247,0.3);transform:translateY(-4px);}
+.pill-ico{font-size:22px;margin-bottom:12px;display:block;}
+.pill-t{font-size:13px;font-weight:500;color:#c4b5fd;margin-bottom:4px;}
+.pill-d{font-size:12px;font-weight:300;color:var(--td);line-height:1.6;}
+
+/* PROCESS */
+.process-sec{padding:100px 40px;text-align:center;}
+.proc-wrap{
+  display:flex;justify-content:center;gap:0;
+  margin-top:60px;position:relative;
+  max-width:900px;margin-left:auto;margin-right:auto;
+}
+.proc-wrap::before{
+  content:'';position:absolute;top:30px;left:10%;right:10%;height:1px;
+  background:linear-gradient(90deg,rgba(124,58,237,0.2),rgba(96,165,250,0.2),rgba(52,211,153,0.2));
+}
+.proc-item{flex:1;text-align:center;padding:0 12px;}
+.proc-circle{
+  width:60px;height:60px;border-radius:50%;margin:0 auto 16px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',cursive;font-size:20px;
+  background:var(--bg);border:1px solid var(--pc);color:var(--pc);
+  position:relative;z-index:1;
+  transition:background 0.3s,box-shadow 0.3s;
+}
+.proc-item:hover .proc-circle{background:var(--pc);color:#fff;box-shadow:0 0 20px var(--pc);}
+.proc-item:nth-child(1){--pc:#a855f7;}
+.proc-item:nth-child(2){--pc:#818cf8;}
+.proc-item:nth-child(3){--pc:#60a5fa;}
+.proc-item:nth-child(4){--pc:#34d399;}
+.proc-item:nth-child(5){--pc:#10b981;}
+.proc-t{font-size:13px;font-weight:500;color:#c4b5fd;margin-bottom:4px;}
+.proc-d{font-size:11px;font-weight:300;color:var(--td);line-height:1.5;}
+
+/* CTA */
+.cta-sec{
+  margin:0 40px 80px;border-radius:24px;
+  background:linear-gradient(135deg,#0f0730 0%,#0a1535 50%,#071c12 100%);
+  border:1px solid rgba(168,85,247,0.12);
+  padding:80px 48px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.cta-glow{
+  position:absolute;top:-120px;left:50%;transform:translateX(-50%);
+  width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,58,237,0.12) 0%,transparent 70%);
+  pointer-events:none;animation:ctaGlow 4s ease infinite alternate;
+}
+@keyframes ctaGlow{from{opacity:0.5;transform:translateX(-50%) scale(1);}to{opacity:1;transform:translateX(-50%) scale(1.2);}}
+.cta-h{
+  font-family:'Bebas Neue',cursive;
+  font-size:clamp(48px,8vw,90px);letter-spacing:3px;
+  background:linear-gradient(135deg,#fff,#c4b5fd,#93c5fd);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:16px;position:relative;z-index:1;
+}
+.cta-s{font-size:15px;font-weight:300;color:var(--td);margin-bottom:32px;position:relative;z-index:1;}
+
+/* FOOTER */
+footer{
+  border-top:1px solid rgba(255,255,255,0.04);
+  padding:28px 40px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;
+}
+.foot-logo{
+  font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:4px;
+  background:linear-gradient(90deg,#a855f7,#60a5fa);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.foot-links{display:flex;gap:24px;}
+.foot-links a{font-size:12px;color:var(--td);text-decoration:none;letter-spacing:1px;transition:color 0.2s;}
+.foot-links a:hover{color:var(--t);}
+.foot-copy{font-size:11px;color:rgba(255,255,255,0.12);}
+
+@keyframes slideDown{from{opacity:0;transform:translateY(-16px);}to{opacity:1;transform:translateY(0);}}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+</style>
+
+<div class="cursor" id="cur"></div>
+<div class="cursor-ring" id="curRing"></div>
+
+<canvas id="cvs"></canvas>
+
+<nav>
+  <div class="nav-logo">Dhruvix</div>
+  <ul class="nav-links">
+    <li><a href="#">Services</a></li>
+    <li><a href="#">Process</a></li>
+    <li><a href="#">Pricing</a></li>
+  </ul>
+  <button class="nav-btn" onclick="sendPrompt('Generate a full service brochure for Dhruvix digital agency')">Start Project ↗</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge"><span class="live-dot"></span> Now taking clients — Indore, India</div>
+  <h1 class="hero-h">
+    <span class="l1">WE BUILD</span>
+    <span class="l2">DIGITAL</span>
+    <span class="l3">EMPIRES.</span>
+  </h1>
+  <div class="typed-wrap">We create <span id="typed"></span><span class="cursor-blink">|</span></div>
+  <p class="hero-sub">Websites that stop the scroll. Ads that bring real leads. AI agents that work while you sleep. All for small businesses ready to grow.</p>
+  <div class="hero-btns">
+    <button class="btn-main" onclick="sendPrompt('Write me a cold outreach WhatsApp message for Dhruvix digital agency targeting small businesses in Indore')">Get a free strategy call ↗</button>
+    <button class="btn-ghost2" onclick="sendPrompt('Show me Dhruvix full pricing packages in detail')">View our work</button>
+  </div>
+  <div class="scroll-ind">
+    <div class="scroll-line"></div>
+    <span class="scroll-txt">Scroll</span>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="mq-track" id="mqt"></div>
+</div>
+
+<!-- SERVICES -->
+<section class="services">
+  <div class="sec-label">What we build</div>
+  <div class="sec-title">Our <span>Services</span></div>
+  <div class="svc-wrap">
+    <div class="svc">
+      <div class="svc-no">01</div>
+      <div class="svc-ico ico1"><i class="ti ti-world" aria-hidden="true"></i></div>
+      <div class="svc-t">Website Design & Dev</div>
+      <div class="svc-d">Lightning-fast, mobile-first websites. Designed to convert visitors into paying customers. Delivered in 5–7 days.</div>
+      <span class="svc-price">Starting ₹8,000</span>
+    </div>
+    <div class="svc">
+      <div class="svc-no">02</div>
+      <div class="svc-ico ico2"><i class="ti ti-ad-2" aria-hidden="true"></i></div>
+      <div class="svc-t">Performance Ads</div>
+      <div class="svc-d">Google & Meta campaigns with real ROI tracking. We don't just run ads — we bring you actual leads with data you can see.</div>
+      <span class="svc-price">Starting ₹5,000</span>
+    </div>
+    <div class="svc">
+      <div class="svc-no">03</div>
+      <div class="svc-ico ico3"><i class="ti ti-robot" aria-hidden="true"></i></div>
+      <div class="svc-t">AI Agents & Chatbots</div>
+      <div class="svc-d">Custom AI-powered WhatsApp & website bots that capture leads, answer queries and book appointments 24/7.</div>
+      <span class="svc-price">Starting ₹10,000</span>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-sec">
+  <div class="stat"><div class="stat-n">3X</div><div class="stat-l">Avg. client ROI</div></div>
+  <div class="stat"><div class="stat-n">48H</div><div class="stat-l">First draft delivery</div></div>
+  <div class="stat"><div class="stat-n">24/7</div><div class="stat-l">AI agent uptime</div></div>
+  <div class="stat"><div class="stat-n">∞</div><div class="stat-l">Growth potential</div></div>
+</div>
+
+<!-- WHY -->
+<section class="why-sec">
+  <div class="why-left">
+    <div class="sec-label">Why us</div>
+    <div class="sec-title">The <span>North Star</span><br/>of your growth</div>
+    <p>Most agencies give you a template and disappear. Dhruvix becomes your long-term digital partner — tracking your growth, optimising campaigns, and building AI that scales with you.</p>
+    <button class="btn-main" onclick="sendPrompt('Create a detailed business proposal template for Dhruvix to send to potential clients')">See how we work ↗</button>
+  </div>
+  <div class="why-right">
+    <div class="pill">
+      <span class="pill-ico"><i class="ti ti-bolt" style="color:#a855f7;" aria-hidden="true"></i></span>
+      <div class="pill-t">Blazing fast</div>
+      <div class="pill-d">First draft in 48 hours. No endless back and forth.</div>
+    </div>
+    <div class="pill">
+      <span class="pill-ico"><i class="ti ti-brain" style="color:#60a5fa;" aria-hidden="true"></i></span>
+      <div class="pill-t">AI-powered</div>
+      <div class="pill-d">Built with cutting-edge AI on every project.</div>
+    </div>
+    <div class="pill">
+      <span class="pill-ico"><i class="ti ti-currency-rupee" style="color:#34d399;" aria-hidden="true"></i></span>
+      <div class="pill-t">Indian pricing</div>
+      <div class="pill-d">Premium results at prices that make sense.</div>
+    </div>
+    <div class="pill">
+      <span class="pill-ico"><i class="ti ti-star" style="color:#fb923c;" aria-hidden="true"></i></span>
+      <div class="pill-t">Long-term partner</div>
+      <div class="pill-d">We don't disappear after launch. Ever.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process-sec">
+  <div class="sec-label" style="justify-content:center;">How it works</div>
+  <div class="sec-title">From zero to <span>launched</span> in days</div>
+  <div class="proc-wrap">
+    <div class="proc-item">
+      <div class="proc-circle">01</div>
+      <div class="proc-t">Discovery</div>
+      <div class="proc-d">We learn your goals & audience</div>
+    </div>
+    <div class="proc-item">
+      <div class="proc-circle">02</div>
+      <div class="proc-t">Strategy</div>
+      <div class="proc-d">Custom plan for your market</div>
+    </div>
+    <div class="proc-item">
+      <div class="proc-circle">03</div>
+      <div class="proc-t">Build</div>
+      <div class="proc-d">Site, ads & AI in parallel</div>
+    </div>
+    <div class="proc-item">
+      <div class="proc-circle">04</div>
+      <div class="proc-t">Launch</div>
+      <div class="proc-d">Go live, fully set up</div>
+    </div>
+    <div class="proc-item">
+      <div class="proc-circle">05</div>
+      <div class="proc-t">Grow</div>
+      <div class="proc-d">Monthly reports & optimise</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-sec">
+  <div class="cta-glow"></div>
+  <div class="cta-h">Ready to grow?<br/>Let's build.</div>
+  <p class="cta-s">Free strategy call. No commitments. Just real clarity on how to grow your business online.</p>
+  <button class="btn-main" style="font-size:15px;padding:16px 44px;" onclick="sendPrompt('Write a follow-up message from Dhruvix after a discovery call with a small business client')">Book a free call ↗</button>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">Dhruvix</div>
+  <div class="foot-links">
+    <a href="#">Services</a>
+    <a href="#">Work</a>
+    <a href="#">Contact</a>
+  </div>
+  <div class="foot-copy">✦ dhruvix.tech · Indore, MP · 2025</div>
+</footer>
+
+<script>
+/* CURSOR */
+const cur=document.getElementById('cur');
+const curRing=document.getElementById('curRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cur.style.left=mx+'px';cur.style.top=my+'px';
+});
+function animRing(){
+  rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;
+  curRing.style.left=rx+'px';curRing.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+document.querySelectorAll('button,a,.svc,.pill').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{curRing.style.transform='translate(-50%,-50%) scale(2)';curRing.style.borderColor='rgba(168,85,247,0.6)';});
+  el.addEventListener('mouseleave',()=>{curRing.style.transform='translate(-50%,-50%) scale(1)';curRing.style.borderColor='rgba(168,85,247,0.4)';});
+});
+
+/* CANVAS PARTICLES */
+const cvs=document.getElementById('cvs');
+const ctx=cvs.getContext('2d');
+let W,H,particles=[];
+function resize(){W=cvs.width=window.innerWidth;H=cvs.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+
+class Particle{
+  constructor(){this.reset();}
+  reset(){
+    this.x=Math.random()*W;this.y=Math.random()*H;
+    this.r=Math.random()*1.4+0.2;
+    this.o=Math.random()*0.5+0.05;
+    this.vx=(Math.random()-0.5)*0.15;
+    this.vy=(Math.random()-0.5)*0.15;
+    this.ds=Math.random()*0.003+0.001;
+    this.ddir=1;
+    const c=Math.random();
+    this.color=c<0.33?`rgba(168,85,247,${this.o})`:c<0.66?`rgba(96,165,250,${this.o})`:`rgba(52,211,153,${this.o})`;
+  }
+  update(){
+    this.x+=this.vx;this.y+=this.vy;
+    this.o+=this.ds*this.ddir;
+    if(this.o>0.6||this.o<0.02)this.ddir*=-1;
+    if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset();
+  }
+  draw(){
+    ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+    ctx.fillStyle=this.color;ctx.fill();
+  }
+}
+
+for(let i=0;i<220;i++)particles.push(new Particle());
+
+/* CONNECTION LINES */
+function drawLines(){
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const dx=particles[i].x-particles[j].x;
+      const dy=particles[i].y-particles[j].y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<100){
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x,particles[i].y);
+        ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.strokeStyle=`rgba(168,85,247,${0.06*(1-dist/100)})`;
+        ctx.lineWidth=0.5;ctx.stroke();
+      }
+    }
+  }
+}
+
+function loop(){
+  ctx.clearRect(0,0,W,H);
+  drawLines();
+  particles.forEach(p=>{p.update();p.draw();});
+  requestAnimationFrame(loop);
+}
+loop();
+
+/* TYPED TEXT */
+const words=['websites that convert.','ads that get results.','AI agents that work 24/7.','digital growth systems.','brands that stand out.'];
+let wi=0,ci=0,del=false;
+const el=document.getElementById('typed');
+function type(){
+  const word=words[wi];
+  if(!del){el.textContent=word.slice(0,++ci);}
+  else{el.textContent=word.slice(0,--ci);}
+  if(!del&&ci===word.length){del=true;setTimeout(type,1800);return;}
+  if(del&&ci===0){del=false;wi=(wi+1)%words.length;}
+  setTimeout(type,del?40:60);
+}
+setTimeout(type,1500);
+
+/* MARQUEE */
+const words2=['Websites','Digital Ads','AI Agents','SEO','Branding','Automation','Chatbots','Lead Gen','UI Design','WhatsApp Bots','Landing Pages','Google Ads'];
+const mqt=document.getElementById('mqt');
+const all=[...words2,...words2,...words2,...words2];
+mqt.innerHTML=all.map(w=>`<span class="mq-item">${w}<span class="mq-star">✦</span></span>`).join('');
+
+/* SCROLL REVEAL */
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.style.opacity='1';
+      e.target.style.transform='translateY(0)';
+    }
+  });
+},{threshold:0.1});
+
+document.querySelectorAll('.svc,.pill,.proc-item,.stat').forEach(el=>{
+  el.style.opacity='0';
+  el.style.transform='translateY(30px)';
+  el.style.transition='opacity 0.7s ease, transform 0.7s ease';
+  obs.observe(el);
+});
+
+/* STAGGER */
+document.querySelectorAll('.svc').forEach((el,i)=>{el.style.transitionDelay=`${i*0.15}s`;});
+document.querySelectorAll('.pill').forEach((el,i)=>{el.style.transitionDelay=`${i*0.1}s`;});
+document.querySelectorAll('.proc-item').forEach((el,i)=>{el.style.transitionDelay=`${i*0.12}s`;});
+document.querySelectorAll('.stat').forEach((el,i)=>{el.style.transitionDelay=`${i*0.1}s`;});
+
+/* COUNTER ANIMATION */
+function animCount(el,target,suffix){
+  let c=0;const dur=2000;const step=dur/60;
+  const inc=target/60;
+  const timer=setInterval(()=>{
+    c=Math.min(c+inc,target);
+    el.textContent=suffix?Math.round(c)+suffix:Math.round(c);
+    if(c>=target)clearInterval(timer);
+  },step);
+}
+</script>
